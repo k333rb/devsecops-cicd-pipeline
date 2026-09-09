@@ -1,0 +1,19 @@
+# Not needed inside the image, installed fresh via requirements.txt instead
+venv/
+__pycache__/
+*.pyc
+
+# Git metadata has no place inside a runtime container
+.git/
+.gitignore
+
+# Test files and results aren't part of the running app
+tests/
+.pytest_cache/
+results.xml
+.coverage
+htmlcov/
+
+# Editor/OS noise
+.vscode/
+.DS_Store
