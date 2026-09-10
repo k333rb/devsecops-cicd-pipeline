@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+# GITHUB_TOKEN is read only by default, packages: write lets this token
+# push images to GitHub Container Registry
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
@@ -28,3 +34,29 @@ jobs:
       # If any test fails, this step fails and nothing downstream runs
       - name: Run tests
         run: python -m pytest tests/ -v
+
+  docker-build:
+    # Only starts after build-test passes, a broken commit never gets an image built
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Fresh checkout since this is a separate job on a separate runner,
+      # nothing carries over from the build-test job automatically
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # GITHUB_TOKEN is auto generated per run, no manual secret setup needed
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tagged by commit sha so every image is traceable to exact source code
+      - name: Build image
+        run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+      - name: Push image
+        run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
