@@ -60,3 +60,27 @@ jobs:
 
       - name: Push image
         run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  security-scan:
+    # Scans the actual image that was just built and pushed
+    needs: docker-build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Trivy needs to authenticate too, this job runs on its own fresh runner
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # exit code 1 on high or critical findings is what makes this a gate,
+      # not just a report, this is what stops a vulnerable image from
+      # reaching the deploy job
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
