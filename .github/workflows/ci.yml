@@ -83,4 +83,6 @@ jobs:
         with:
           image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
           severity: CRITICAL,HIGH
+          # Skips CVEs with no vendor fix yet, so the gate cannot block forever
+          ignore-unfixed: true
           exit-code: 1
