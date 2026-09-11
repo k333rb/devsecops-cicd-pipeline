@@ -86,3 +86,25 @@ jobs:
           # Skips CVEs with no vendor fix yet, so the gate cannot block forever
           ignore-unfixed: true
           exit-code: 1
+
+  promote-image:
+    # Only runs once the image has actually passed the scan
+    needs: security-scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Server side copy by digest, the image is never pulled or rebuilt here,
+      # so its bytes are guaranteed identical to what the scan checked
+      - name: Import scanned image into ACR
+        run: |
+          az acr import \
+            --name ticketpipelineacr \
+            --source ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            --image ticket-pipeline-demo:${{ github.sha }} \
+            --image ticket-pipeline-demo:latest \
+            --force
