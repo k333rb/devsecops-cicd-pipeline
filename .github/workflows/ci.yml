@@ -107,4 +107,6 @@ jobs:
             --source ghcr.io/${{ github.repository }}:${{ github.sha }} \
             --image ticket-pipeline-demo:${{ github.sha }} \
             --image ticket-pipeline-demo:latest \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }} \
             --force
