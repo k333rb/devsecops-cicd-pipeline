@@ -7,10 +7,11 @@ security problems, and put it online automatically.
 
 ## See it live
 
-https://ticketpipeline-app.whitebay-d7c73885.eastasia.azurecontainerapps.io/health
+https://ticketpipeline-app.greenground-e04237ab.eastasia.azurecontainerapps.io/health
 
-Note: to save on cloud costs, this may not always be running. If the
-link doesn't load, it's just switched off for now, not broken.
+Note: this app may be offline between demos to save cloud credits, and
+its URL can change each time it's redeployed. If the link above
+doesn't work, it's just temporarily down, not broken.
 
 ## What the app can do
 
